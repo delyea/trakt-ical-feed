@@ -28,9 +28,9 @@ home.get("/", async (c) => {
           content="Generate an iCal calendar feed from your Trakt watchlist. Subscribe in Google Calendar, Apple Calendar, or Outlook to track air dates for TV shows and release dates for movies."
         />
         <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://trakt.samnesler.com/" />
+        <link rel="canonical" href="https://trakt.tsuni.dev/" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://trakt.samnesler.com/" />
+        <meta property="og:url" content="https://trakt.tsuni.dev/" />
         <meta
           property="og:title"
           content="Trakt iCal Generator – Calendar Feed for Your Watchlist"
@@ -39,10 +39,7 @@ home.get("/", async (c) => {
           property="og:description"
           content="Generate an iCal calendar feed from your Trakt watchlist. Subscribe in Google Calendar, Apple Calendar, or Outlook to track air dates for TV shows and release dates for movies."
         />
-        <meta
-          property="og:image"
-          content="https://trakt.samnesler.com/logo.svg"
-        />
+        <meta property="og:image" content="https://trakt.tsuni.dev/logo.svg" />
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />
         <Style>{styles}</Style>
       </head>

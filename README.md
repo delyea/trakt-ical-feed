@@ -4,7 +4,7 @@
 
 # Trakt iCal Feed
 
-https://trakt.samnesler.com
+https://trakt.tsuni.dev
 
 Subscribe to your Trakt watchlist as a calendar feed. See air dates for shows and release dates for movies, right in your calendar app.
 
