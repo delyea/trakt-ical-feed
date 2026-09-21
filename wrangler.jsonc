@@ -16,7 +16,7 @@
 		"prod": {
 			"routes": [
 				{
-					"pattern": "trakt.samnesler.com",
+					"pattern": "trakt.tsuni.dev",
 					"custom_domain": true
 				}
 			],
