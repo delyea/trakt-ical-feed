@@ -11,6 +11,7 @@ declare namespace Cloudflare {
 		TRAKT_CLIENT_ID: string;
 		TRAKT_CLIENT_SECRET: string;
 		ENCRYPTION_KEY: string;
+		ALLOWED_TRAKT_USERS: string;
 	}
 	interface Env {
 		SESSIONS: KVNamespace;
@@ -18,6 +19,7 @@ declare namespace Cloudflare {
 		TRAKT_CLIENT_ID: string;
 		TRAKT_CLIENT_SECRET: string;
 		ENCRYPTION_KEY: string;
+		ALLOWED_TRAKT_USERS: string;
 	}
 }
 interface CloudflareBindings extends Cloudflare.Env {}
@@ -25,7 +27,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "TRAKT_CLIENT_ID" | "TRAKT_CLIENT_SECRET" | "ENCRYPTION_KEY">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "TRAKT_CLIENT_ID" | "TRAKT_CLIENT_SECRET" | "ENCRYPTION_KEY" | "ALLOWED_TRAKT_USERS">> {}
 }
 
 // Begin runtime types

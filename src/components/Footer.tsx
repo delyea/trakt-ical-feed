@@ -5,24 +5,21 @@ export const Footer = () => (
     <div class="footer-links">
       <a
         class="footer-link"
-        href="https://github.com/the-snesler/trakt-ical-feed"
+        href="https://github.com/delyea/trakt-ical-feed"
         target="_blank"
         rel="noopener noreferrer"
       >
         <BrandIcon icon={Icons.github} size={16} />
         <span>Source</span>
       </a>
-      <a
-        class="footer-link"
-        href="https://app.trakt.tv/profile/oncetsuni"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <BrandIcon icon={Icons.trakt} size={16} />
-        <span>oncetsuni</span>
-      </a>
     </div>
-    <p class="footer-note">Built by Sam Nesler. Not affiliated with Trakt.</p>
+    <p class="footer-note">
+      Forked from{" "}
+      <a href="https://github.com/the-snesler/trakt-ical-feed" target="_blank" rel="noopener noreferrer">
+        Sam Nesler's trakt-ical-feed
+      </a>
+      . Not affiliated with Trakt.
+    </p>
   </footer>
 );
 
@@ -60,4 +57,5 @@ ${brandIconStyles}
     color: #666;
     font-size: 0.75rem;
   }
+  .footer-note a { color: inherit; }
 `;

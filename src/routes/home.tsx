@@ -16,6 +16,7 @@ home.get("/", async (c) => {
   }
 
   const error = c.req.query("error");
+  const origin = new URL(c.req.url).origin;
 
   return c.html(
     <html lang="en">
@@ -27,10 +28,10 @@ home.get("/", async (c) => {
           name="description"
           content="Generate an iCal calendar feed from your Trakt watchlist. Subscribe in Google Calendar, Apple Calendar, or Outlook to track air dates for TV shows and release dates for movies."
         />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://trakt.tsuni.dev/" />
+        <meta name="robots" content="noindex, nofollow" />
+        <link rel="canonical" href={`${origin}/`} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://trakt.tsuni.dev/" />
+        <meta property="og:url" content={`${origin}/`} />
         <meta
           property="og:title"
           content="Trakt iCal Generator – Calendar Feed for Your Watchlist"
@@ -39,7 +40,7 @@ home.get("/", async (c) => {
           property="og:description"
           content="Generate an iCal calendar feed from your Trakt watchlist. Subscribe in Google Calendar, Apple Calendar, or Outlook to track air dates for TV shows and release dates for movies."
         />
-        <meta property="og:image" content="https://trakt.tsuni.dev/logo.svg" />
+        <meta property="og:image" content={`${origin}/logo.svg`} />
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />
         <Style>{styles}</Style>
       </head>
@@ -55,7 +56,11 @@ home.get("/", async (c) => {
             </p>
 
             {error && (
-              <p class="error">Authentication failed. Please try again.</p>
+              <p class="error">
+                {error === "not_allowed"
+                  ? "This instance is private. Your Trakt account isn't allowed to sign in."
+                  : "Authentication failed. Please try again."}
+              </p>
             )}
 
             {loggedIn ? (

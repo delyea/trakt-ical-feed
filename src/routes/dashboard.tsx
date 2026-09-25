@@ -148,7 +148,7 @@ dashboard.get("/", async (c) => {
             <p class="description">
               Create a new feed URL. The old URL will stop working immediately.
             </p>
-            <form method="post" action="/feed/regenerate">
+            <form method="post" action="/dashboard/feed/regenerate">
               <button type="submit" class="btn btn-danger">
                 Regenerate Token
               </button>

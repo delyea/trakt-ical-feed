@@ -4,7 +4,7 @@
 
 # Trakt iCal Feed
 
-https://trakt.tsuni.dev
+A private, single-user fork of [the-snesler/trakt-ical-feed](https://github.com/the-snesler/trakt-ical-feed). Sign-in is restricted to the Trakt users listed in `ALLOWED_TRAKT_USERS`.
 
 Subscribe to your Trakt watchlist as a calendar feed. See air dates for shows and release dates for movies, right in your calendar app.
 
@@ -33,7 +33,7 @@ The app runs as a Cloudflare Worker and depends on Cloudflare D1 and KV, so this
 ### 2. Clone and install
 
 ```sh
-git clone https://github.com/the-snesler/trakt-ical-feed.git
+git clone https://github.com/delyea/trakt-ical-feed.git
 cd trakt-ical-feed
 pnpm install
 ```
@@ -57,11 +57,12 @@ pnpm wrangler d1 execute trakt-ical-db --remote --file=./src/db/schema.sql
 
 ### 4. Configure secrets
 
-The worker needs three secrets:
+The worker needs four secrets:
 
 - `TRAKT_CLIENT_ID` — from your Trakt application
 - `TRAKT_CLIENT_SECRET` — from your Trakt application
 - `ENCRYPTION_KEY` — a random string used to encrypt stored OAuth tokens (e.g. `openssl rand -base64 32`)
+- `ALLOWED_TRAKT_USERS` — comma-separated Trakt usernames allowed to sign in (nobody can sign in if unset)
 
 Set them with Wrangler:
 
@@ -69,6 +70,7 @@ Set them with Wrangler:
 pnpm wrangler secret put TRAKT_CLIENT_ID
 pnpm wrangler secret put TRAKT_CLIENT_SECRET
 pnpm wrangler secret put ENCRYPTION_KEY
+pnpm wrangler secret put ALLOWED_TRAKT_USERS
 ```
 
 For local development, create a `.dev.vars` file in the project root with the same keys:
@@ -77,6 +79,7 @@ For local development, create a `.dev.vars` file in the project root with the sa
 TRAKT_CLIENT_ID=...
 TRAKT_CLIENT_SECRET=...
 ENCRYPTION_KEY=...
+ALLOWED_TRAKT_USERS=...
 ```
 
 ### 5. Run locally or deploy

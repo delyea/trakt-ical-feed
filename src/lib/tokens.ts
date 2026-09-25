@@ -13,3 +13,7 @@ export function generateSessionId(): string {
 export function generateFeedToken(): string {
   return generateToken(32);
 }
+
+export function generateOAuthState(): string {
+  return generateToken(16);
+}
