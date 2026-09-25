@@ -3,6 +3,8 @@
 	"name": "trakt-serverless-ical",
 	"main": "src/index.tsx",
 	"compatibility_date": "2026-03-12",
+	"workers_dev": true,
+	"preview_urls": false,
 	"observability": {
 		"enabled": true
 	},
@@ -18,13 +20,13 @@
 		{
 			"binding": "DB",
 			"database_name": "trakt-ical-db",
-			"database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+			"database_id": "5869c0d8-8e3c-4cdc-9582-8b4b5234f98e"
 		}
 	],
 	"kv_namespaces": [
 		{
 			"binding": "SESSIONS",
-			"id": "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+			"id": "c6463daba29346fb9b7b7798bf9e4a86"
 		}
 	]
 }
