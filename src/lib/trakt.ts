@@ -95,7 +95,7 @@ export async function getProfile(
 const CALENDAR_CHUNK_DAYS = 33;
 
 async function fetchCalendarRange<T>(
-  kind: "shows" | "movies",
+  kind: "shows" | "shows/premieres" | "movies",
   clientId: string,
   accessToken: string,
   pastDays: number,
@@ -131,9 +131,11 @@ export function fetchCalendarShows(
   clientId: string,
   accessToken: string,
   pastDays: number,
-  futureDays: number
+  futureDays: number,
+  premieresOnly: boolean = false
 ): Promise<CalendarShow[]> {
-  return fetchCalendarRange("shows", clientId, accessToken, pastDays, futureDays);
+  const kind = premieresOnly ? "shows/premieres" : "shows";
+  return fetchCalendarRange(kind, clientId, accessToken, pastDays, futureDays);
 }
 
 export function fetchCalendarMovies(

@@ -2,8 +2,13 @@ import ical from "ical-generator";
 import dayjs from "dayjs";
 import type { CalendarShow, CalendarMovie } from "./types";
 
-export function generateCalendar(shows: CalendarShow[], movies: CalendarMovie[], allDay: boolean = false): string {
-  const calendar = ical({ name: "Trakt Watchlist Calendar", timezone: "UTC" });
+export function generateCalendar(
+  name: string,
+  shows: CalendarShow[],
+  movies: CalendarMovie[],
+  allDay: boolean = false
+): string {
+  const calendar = ical({ name, timezone: "UTC" });
   // Adjacent calendar chunks can return the same item at their boundary.
   const seen = new Set<string>();
 

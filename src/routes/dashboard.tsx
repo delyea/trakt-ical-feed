@@ -11,8 +11,66 @@ import {
 } from "../lib/trakt";
 import { toLetterboxdCsv } from "../lib/letterboxd";
 import { Footer, footerStyles } from "../components/Footer";
+import {
+  DEFAULT_FUTURE_DAYS,
+  DEFAULT_PAST_DAYS,
+  FEEDS,
+  MAX_FUTURE_DAYS,
+  MAX_PAST_DAYS,
+  type FeedDefinition,
+} from "../lib/feeds";
 
 const dashboard = new Hono<AppEnv>();
+
+const FeedCard = ({ feed, feedUrl }: { feed: FeedDefinition; feedUrl: string }) => (
+  <section class="card" id={`feed-${feed.type}`}>
+    <h2>{feed.title}</h2>
+    <p class="description">{feed.description}</p>
+    <div class="feed-url-group">
+      <input type="text" readonly value={feedUrl} class="feed-url" />
+      <button onclick={`copyUrl('${feed.type}')`} class="btn copy-btn">
+        Copy
+      </button>
+    </div>
+    <div class="range-group">
+      <label class="range-label">
+        Days back
+        <input
+          type="number"
+          class="range-input past-days"
+          min="0"
+          max={String(MAX_PAST_DAYS)}
+          value={String(DEFAULT_PAST_DAYS)}
+          oninput={`updateUrl('${feed.type}')`}
+        />
+      </label>
+      <label class="range-label">
+        Days ahead
+        <input
+          type="number"
+          class="range-input future-days"
+          min="0"
+          max={String(MAX_FUTURE_DAYS)}
+          value={String(DEFAULT_FUTURE_DAYS)}
+          oninput={`updateUrl('${feed.type}')`}
+        />
+      </label>
+      {feed.supportsTimedEvents && (
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            class="allday-toggle"
+            onchange={`updateUrl('${feed.type}')`}
+          />
+          All-day events
+        </label>
+      )}
+    </div>
+    <p class="range-hint">
+      Up to {MAX_PAST_DAYS} days back and {MAX_FUTURE_DAYS} days ahead.
+    </p>
+  </section>
+);
 
 dashboard.use("*", requireAuth);
 
@@ -63,60 +121,15 @@ dashboard.get("/", async (c) => {
             </div>
           </header>
 
-          <section class="card">
-            <h2>Your Feed URL</h2>
-            <p class="description">
-              Add this URL to your calendar app (Google Calendar, Apple
-              Calendar, Outlook) to subscribe to your Trakt watchlist.
-            </p>
-            <div class="feed-url-group">
-              <input
-                type="text"
-                readonly
-                value={feedUrl}
-                id="feed-url"
-                class="feed-url"
-              />
-              <button onclick="copyUrl()" class="btn" id="copy-btn">
-                Copy
-              </button>
-            </div>
-            <label class="checkbox-label">
-              <input
-                type="checkbox"
-                id="allday-toggle"
-                onchange="toggleAllDay()"
-              />
-              All-day events
-            </label>
-            <div class="range-group">
-              <label class="range-label">
-                Days back
-                <input
-                  type="number"
-                  id="past-days"
-                  class="range-input"
-                  min="0"
-                  max="180"
-                  value="30"
-                  oninput="updateUrl()"
-                />
-              </label>
-              <label class="range-label">
-                Days ahead
-                <input
-                  type="number"
-                  id="future-days"
-                  class="range-input"
-                  min="0"
-                  max="365"
-                  value="90"
-                  oninput="updateUrl()"
-                />
-              </label>
-            </div>
-            <p class="range-hint">Up to 180 days back and 365 days ahead.</p>
-          </section>
+          <p class="intro">
+            Add these URLs to your calendar app (Google Calendar, Apple
+            Calendar, Outlook) to subscribe to your Trakt watchlist. Each feed
+            has its own date range.
+          </p>
+
+          {FEEDS.map((f) => (
+            <FeedCard feed={f} feedUrl={`${feedUrl}?type=${f.type}`} />
+          ))}
 
           <section class="card">
             <h2>Pick something to watch</h2>
@@ -187,22 +200,24 @@ dashboard.get("/", async (c) => {
         <script
           dangerouslySetInnerHTML={{
             __html: `
-          var baseUrl = document.getElementById('feed-url').getAttribute('value');
-          function updateUrl() {
-            var input = document.getElementById('feed-url');
+          function updateUrl(type) {
+            var card = document.getElementById('feed-' + type);
+            var input = card.querySelector('.feed-url');
             var params = [];
-            if (document.getElementById('allday-toggle').checked) params.push('allday=1');
-            var past = document.getElementById('past-days').value;
-            var future = document.getElementById('future-days').value;
-            if (past !== '' && past !== '30') params.push('past=' + past);
-            if (future !== '' && future !== '90') params.push('future=' + future);
-            input.value = params.length ? baseUrl + '?' + params.join('&') : baseUrl;
+            var allday = card.querySelector('.allday-toggle');
+            if (allday && allday.checked) params.push('allday=1');
+            var past = card.querySelector('.past-days').value;
+            var future = card.querySelector('.future-days').value;
+            if (past !== '' && past !== '${DEFAULT_PAST_DAYS}') params.push('past=' + past);
+            if (future !== '' && future !== '${DEFAULT_FUTURE_DAYS}') params.push('future=' + future);
+            var base = input.getAttribute('value');
+            input.value = params.length ? base + '&' + params.join('&') : base;
           }
-          function toggleAllDay() { updateUrl(); }
-          function copyUrl() {
-            var input = document.getElementById('feed-url');
+          function copyUrl(type) {
+            var card = document.getElementById('feed-' + type);
+            var input = card.querySelector('.feed-url');
+            var btn = card.querySelector('.copy-btn');
             navigator.clipboard.writeText(input.value).then(function() {
-              var btn = document.getElementById('copy-btn');
               btn.textContent = 'Copied!';
               setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
             });
@@ -355,7 +370,8 @@ ${footerStyles}
     cursor: pointer;
   }
   .checkbox-label input { cursor: pointer; }
-  .range-group { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 0.75rem; }
+  .intro { font-size: 0.9rem; color: #999; margin-bottom: 1rem; }
+  .range-group { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; }
   .range-label {
     display: flex;
     align-items: center;
