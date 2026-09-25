@@ -90,40 +90,59 @@ export async function getProfile(
   return res.json();
 }
 
-export async function fetchCalendarShows(
+// Trakt caps a single calendar request at 33 days, so longer ranges are split
+// into consecutive chunks and fetched in parallel.
+const CALENDAR_CHUNK_DAYS = 33;
+
+async function fetchCalendarRange<T>(
+  kind: "shows" | "movies",
   clientId: string,
   accessToken: string,
-  days: number = 33
-): Promise<CalendarShow[]> {
-  const startDate = new Date().toISOString().split("T")[0];
-  const res = await fetch(
-    `${TRAKT_API}/calendars/my/shows/${startDate}/${days}`,
-    { headers: headers(clientId, accessToken) }
-  );
+  pastDays: number,
+  futureDays: number
+): Promise<T[]> {
+  const start = new Date();
+  start.setUTCDate(start.getUTCDate() - pastDays);
+  const totalDays = pastDays + futureDays;
 
-  if (!res.ok) {
-    throw new Error(`Failed to fetch calendar shows: ${res.status}`);
+  const requests: Promise<T[]>[] = [];
+  for (let offset = 0; offset < totalDays; offset += CALENDAR_CHUNK_DAYS) {
+    const chunkStart = new Date(start);
+    chunkStart.setUTCDate(chunkStart.getUTCDate() + offset);
+    const date = chunkStart.toISOString().split("T")[0];
+    const days = Math.min(CALENDAR_CHUNK_DAYS, totalDays - offset);
+
+    requests.push(
+      fetch(`${TRAKT_API}/calendars/my/${kind}/${date}/${days}`, {
+        headers: headers(clientId, accessToken),
+      }).then((res) => {
+        if (!res.ok) {
+          throw new Error(`Failed to fetch calendar ${kind}: ${res.status}`);
+        }
+        return res.json() as Promise<T[]>;
+      })
+    );
   }
 
-  return res.json();
+  return (await Promise.all(requests)).flat();
 }
 
-export async function fetchCalendarMovies(
+export function fetchCalendarShows(
   clientId: string,
   accessToken: string,
-  days: number = 33
+  pastDays: number,
+  futureDays: number
+): Promise<CalendarShow[]> {
+  return fetchCalendarRange("shows", clientId, accessToken, pastDays, futureDays);
+}
+
+export function fetchCalendarMovies(
+  clientId: string,
+  accessToken: string,
+  pastDays: number,
+  futureDays: number
 ): Promise<CalendarMovie[]> {
-  const startDate = new Date().toISOString().split("T")[0];
-  const res = await fetch(
-    `${TRAKT_API}/calendars/my/movies/${startDate}/${days}`,
-    { headers: headers(clientId, accessToken) }
-  );
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch calendar movies: ${res.status}`);
-  }
-
-  return res.json();
+  return fetchCalendarRange("movies", clientId, accessToken, pastDays, futureDays);
 }
 
 export async function fetchWatchlistMovies(

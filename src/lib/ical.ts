@@ -4,9 +4,14 @@ import type { CalendarShow, CalendarMovie } from "./types";
 
 export function generateCalendar(shows: CalendarShow[], movies: CalendarMovie[], allDay: boolean = false): string {
   const calendar = ical({ name: "Trakt Watchlist Calendar", timezone: "UTC" });
+  // Adjacent calendar chunks can return the same item at their boundary.
+  const seen = new Set<string>();
 
   for (const item of shows) {
     if (!item.first_aired) continue;
+    const uid = `trakt-show-${item.episode.ids.trakt}`;
+    if (seen.has(uid)) continue;
+    seen.add(uid);
 
     const event = calendar.createEvent({
       start: dayjs(item.first_aired).toDate(),
@@ -14,19 +19,22 @@ export function generateCalendar(shows: CalendarShow[], movies: CalendarMovie[],
       description: item.episode.title ?? "",
       allDay,
     });
-    event.uid(`trakt-show-${item.episode.ids.trakt}`);
+    event.uid(uid);
   }
 
   for (const item of movies) {
     const releaseDate = item.released || item.movie?.released;
     if (!releaseDate) continue;
+    const uid = `trakt-movie-${item.movie.ids.trakt}`;
+    if (seen.has(uid)) continue;
+    seen.add(uid);
 
     const event = calendar.createEvent({
       start: dayjs(releaseDate).toDate(),
       summary: item.movie.title,
       allDay: true,
     });
-    event.uid(`trakt-movie-${item.movie.ids.trakt}`);
+    event.uid(uid);
   }
 
   return calendar.toString();

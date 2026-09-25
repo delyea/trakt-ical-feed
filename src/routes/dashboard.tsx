@@ -89,6 +89,33 @@ dashboard.get("/", async (c) => {
               />
               All-day events
             </label>
+            <div class="range-group">
+              <label class="range-label">
+                Days back
+                <input
+                  type="number"
+                  id="past-days"
+                  class="range-input"
+                  min="0"
+                  max="180"
+                  value="30"
+                  oninput="updateUrl()"
+                />
+              </label>
+              <label class="range-label">
+                Days ahead
+                <input
+                  type="number"
+                  id="future-days"
+                  class="range-input"
+                  min="0"
+                  max="365"
+                  value="90"
+                  oninput="updateUrl()"
+                />
+              </label>
+            </div>
+            <p class="range-hint">Up to 180 days back and 365 days ahead.</p>
           </section>
 
           <section class="card">
@@ -163,8 +190,13 @@ dashboard.get("/", async (c) => {
           var baseUrl = document.getElementById('feed-url').getAttribute('value');
           function updateUrl() {
             var input = document.getElementById('feed-url');
-            var allday = document.getElementById('allday-toggle').checked;
-            input.value = allday ? baseUrl + '?allday=1' : baseUrl;
+            var params = [];
+            if (document.getElementById('allday-toggle').checked) params.push('allday=1');
+            var past = document.getElementById('past-days').value;
+            var future = document.getElementById('future-days').value;
+            if (past !== '' && past !== '30') params.push('past=' + past);
+            if (future !== '' && future !== '90') params.push('future=' + future);
+            input.value = params.length ? baseUrl + '?' + params.join('&') : baseUrl;
           }
           function toggleAllDay() { updateUrl(); }
           function copyUrl() {
@@ -323,6 +355,24 @@ ${footerStyles}
     cursor: pointer;
   }
   .checkbox-label input { cursor: pointer; }
+  .range-group { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 0.75rem; }
+  .range-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #ccc;
+  }
+  .range-input {
+    width: 5rem;
+    padding: 0.3rem 0.5rem;
+    background: #111;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #e0e0e0;
+    font-size: 0.85rem;
+  }
+  .range-hint { margin-top: 0.5rem; font-size: 0.75rem; color: #777; }
   .feed-url {
     flex: 1;
     padding: 0.5rem 0.75rem;
